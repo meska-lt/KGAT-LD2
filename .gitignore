@@ -1,0 +1,14 @@
+# Compiled Object files
+*.o
+
+# Executable
+cissoid_of_diocles
+
+# Mac OS X files
+.DS_Store
+
+# Sublime Text files
+*.sublime-workspace
+
+# Program output files
+*.bmp
