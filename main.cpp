@@ -11,6 +11,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 #include "BMP24.h"
 
 #define RESULT_IMAGE_WIDTH 1000
@@ -91,12 +92,19 @@ void fillBitmapWithColor(BMP24 &bitmap, Color color) {
 	}
 }
 
-void drawCissoidOfDioclesInBitmapWithColor(BMP24 &bitmap, Color color) {
+void drawCissoidOfDioclesInBitmapWithGridColumnWidth(BMP24 &bitmap, int columnWidth, Color color) {
 	std::cout << "void drawCissoidOfDioclesInBitmapWithColor(BMP24, Color);\n";
 
-	for (int x = 0; x < bitmap.plotis; x++) {
-		int y = 0;
+	int pseudoCenterHorizontal = (bitmap.plotis - (bitmap.plotis % columnWidth)) / 2;
+	int pseudoCenterVertical = (bitmap.aukstis - (bitmap.aukstis % columnWidth)) / 2;
 
+	int a = 48*3;
+
+	for (int x = pseudoCenterHorizontal; x < pseudoCenterHorizontal + a; x++) {
+		int y = sqrt(x^3 / (2*a - x));
+
+		bitmap.dekTaska(x, pseudoCenterVertical + y, color.r, color.g, color.b);
+		bitmap.dekTaska(x, pseudoCenterVertical - y, color.r, color.g, color.b);
 	}
 }
 
@@ -216,6 +224,7 @@ int main() {
 	Color backgroundColor = {255, 255, 255};
 	Color gridColor = {150, 150, 150};
 	Color axlesColor = {0, 0, 0};
+	Color curveColor = {64, 128, 192};
 
 	int columnWidth = 48;
 	int axleWidth = 4;
@@ -223,6 +232,7 @@ int main() {
 	fillBitmapWithColor(resultImage, backgroundColor);
 	drawGridWithColumnWidthAndColorInBitmap(resultImage, columnWidth, gridColor);
 	drawCoordinateAxlesInBitmapWithColor(resultImage, columnWidth, axleWidth, axlesColor);
+	drawCissoidOfDioclesInBitmapWithGridColumnWidth(resultImage, columnWidth, curveColor);
 
 	resultImage.rasykIByla(RESULT_FILENAME);
 
