@@ -1,10 +1,10 @@
 /**
-	KGAT-15 LD1
+	KGAT-15 LD2
 	main.cpp
 	Purpose: draw author's initials (character symbols have to be filled with gradient).
 
 	@author: Robertas Kvietkauskas
-	@version: 0.2.0
+	@version: 0.3.0
 
  */
 
@@ -48,7 +48,6 @@ bool pointInsideTriangle(Point s, Point a, Point b, Point c) {
 }
 
 void drawTriangleInBitmap(BMP24 &bitmap, int c1x, int c1y, int c2x, int c2y, int c3x, int c3y, Color color) {
-	// std::cout << "void drawTriangleInBitmap(BMP24, int, int, int, int, int, int);\n";
 	std::cout << "void drawTriangleInBitmap(BMP24, " << c1x << ", " << c1y << ", " << c2x << ", " << c2y << ", " << c3x << ", " << c3y << ");\n";
 
 	for (int x = 0; x < bitmap.plotis; x++) {
@@ -92,19 +91,46 @@ void fillBitmapWithColor(BMP24 &bitmap, Color color) {
 	}
 }
 
+void drawBigDotAtPointInBitmapWithColor(BMP24 &bitmap, Point bitmapCenter, Point dotCenter, Color color) {
+	bitmap.dekTaska((bitmapCenter.x + dotCenter.x), (bitmapCenter.y - dotCenter.y), color.r, color.g, color.b);
+	bitmap.dekTaska((bitmapCenter.x + dotCenter.x + 1), (bitmapCenter.y - dotCenter.y), color.r, color.g, color.b);
+	bitmap.dekTaska((bitmapCenter.x + dotCenter.x - 1), (bitmapCenter.y - dotCenter.y), color.r, color.g, color.b);
+	bitmap.dekTaska((bitmapCenter.x + dotCenter.x), (bitmapCenter.y - dotCenter.y + 1), color.r, color.g, color.b);
+	bitmap.dekTaska((bitmapCenter.x + dotCenter.x), (bitmapCenter.y - dotCenter.y - 1), color.r, color.g, color.b);
+}
+
+void drawDotAtPointInBitmapWithColor(BMP24 &bitmap, Point bitmapCenter, Point dotCenter, Color color) {
+	bitmap.dekTaska((bitmapCenter.x + dotCenter.x), (bitmapCenter.y - dotCenter.y), color.r, color.g, color.b);
+}
+
 void drawCissoidOfDioclesInBitmapWithGridColumnWidth(BMP24 &bitmap, int columnWidth, Color color) {
-	std::cout << "void drawCissoidOfDioclesInBitmapWithColor(BMP24, Color);\n";
+	std::cout << "void drawCissoidOfDioclesInBitmapWithGridColumnWidth(BMP24, int, Color);\n";
 
-	int pseudoCenterHorizontal = (bitmap.plotis - (bitmap.plotis % columnWidth)) / 2;
-	int pseudoCenterVertical = (bitmap.aukstis - (bitmap.aukstis % columnWidth)) / 2;
+	Point dotPoint = {0, 0};
+	Point center = {0, 0}; 
 
-	int a = 48*3;
+	center.x = (bitmap.plotis - (bitmap.plotis % columnWidth)) / 2;
+	center.y = (bitmap.aukstis - (bitmap.aukstis % columnWidth)) / 2;
 
-	for (int x = pseudoCenterHorizontal; x < pseudoCenterHorizontal + a; x++) {
-		int y = sqrt(x^3 / (2*a - x));
+	int a = 48*6;
+	float theta = 0;
 
-		bitmap.dekTaska(x, pseudoCenterVertical + y, color.r, color.g, color.b);
-		bitmap.dekTaska(x, pseudoCenterVertical - y, color.r, color.g, color.b);
+	while (theta <= M_PI) {
+		float r = a * sin(theta) * tan(theta);
+		dotPoint.x = r * cos(theta);
+		dotPoint.y = r * sin(theta);
+
+		bool horizontalOver9000 = (dotPoint.x + center.x >= bitmap.plotis - 1);
+		bool verticalOver9000 = (dotPoint.y + center.y >= bitmap.aukstis - 1);
+		bool horizontalBelow0 = (center.x - dotPoint.x < 1);
+		bool verticalBelow0 = (center.y - dotPoint.y < 1);
+		bool allCool = !(horizontalOver9000 || verticalOver9000 || horizontalBelow0 || verticalBelow0);
+
+		if (allCool)
+			drawBigDotAtPointInBitmapWithColor(bitmap, center, dotPoint, color);
+			// drawDotAtPointInBitmapWithColor(bitmap, center, dotPoint, color);
+
+		theta += 0.001; // antialiasing coef
 	}
 }
 
